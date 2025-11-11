@@ -3,6 +3,7 @@ package com.gaston.httpserver;
 import com.gaston.httpserver.config.Configuration;
 import com.gaston.httpserver.config.ConfigurationManager;
 
+import java.awt.image.CropImageFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,8 +28,13 @@ public class HttpServer {
 
 
             //Write
-            String html = "<html><head></head><body><h1>Hello World</h1></body></html>";
-             String response = "";
+            String html = "<html><head></head><body><h1>Hello Gustav</h1></body></html>";
+            final  String CRLF = "\n\r";
+             String response = "HTTP/1.1  200 OK"+CRLF+"Content Length:"+html.getBytes().length +CRLF+
+                     CRLF+
+                     html+
+                     CRLF+ CRLF;
+             outputStream.write(response.getBytes());
 
 
 
