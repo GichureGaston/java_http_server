@@ -2,50 +2,28 @@ package com.gaston.httpserver;
 
 import com.gaston.httpserver.config.Configuration;
 import com.gaston.httpserver.config.ConfigurationManager;
+import com.gaston.httpserver.config.HttpConfigurationException;
+import com.gaston.httpserver.core.ServerListenerThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.awt.image.CropImageFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Arrays;
 
 // Driver class for my http server
 public class HttpServer {
+    public final static Logger LOGGER =  LoggerFactory.getLogger(HttpServer.class);
     public static void main(String[] args) {
-        System.out.println("Server Start!");
+
+        LOGGER.info("Server Start!");
         ConfigurationManager.getInstance().loadConfigurationFile("src/main/resources/http.json");
         Configuration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
-        System.out.println("Using Port : "+conf.getPort());
-        System.out.println("Using WebRoot : "+conf.getWebroot());
+        LOGGER.info("Using Port : "+conf.getPort());
+        LOGGER.info("Using WebRoot : "+conf.getWebroot());
         try {
-            ServerSocket serverSocket = new ServerSocket(conf.getPort());
-            Socket socket = serverSocket.accept();
-            InputStream inputStream = socket.getInputStream();
-            OutputStream outputStream = socket.getOutputStream();
-
-
-
-            //Write
-            String html = "<html><head></head><body><h1>Hello Gustav</h1></body></html>";
-            final  String CRLF = "\n\r";
-             String response = "HTTP/1.1  200 OK"+CRLF+"Content Length:"+html.getBytes().length +CRLF+
-                     CRLF+
-                     html+
-                     CRLF+ CRLF;
-             outputStream.write(response.getBytes());
-
-
-
-            inputStream.close();
-            outputStream.close();
-            socket.close();
-            serverSocket.close();
-
-
+            ServerListenerThread serverListenerThread = new ServerListenerThread(conf.getPort(),conf.getWebroot());
+            serverListenerThread.start();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new HttpConfigurationException(e);
         }
 
 
