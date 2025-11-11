@@ -17,8 +17,7 @@ public class Json {
         return objectMapper;
     };
     public static JsonNode parse(String jsonSrc)throws IOException {
-        return new ObjectMapper().readTree(jsonSrc);
-    }
+        return myObjectMapper.readTree(jsonSrc);    }
     public static<A> A fromJson(JsonNode node , Class<A> clazz) throws JsonProcessingException {
             return myObjectMapper.treeToValue(node, clazz);
     }
