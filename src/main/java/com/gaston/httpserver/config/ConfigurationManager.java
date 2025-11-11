@@ -1,7 +1,5 @@
 package com.gaston.httpserver.config;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.gaston.httpserver.config.util.Json;
 
 import java.io.FileNotFoundException;
@@ -32,10 +30,10 @@ public class ConfigurationManager {
         int i;
 
         try {
-            while ((i = fileReader.read()) != -1) {  // Fixed: changed == to !=
+            while ((i = fileReader.read()) != -1) {
                 stringBuffer.append((char) i);
             }
-            fileReader.close();  // Don't forget to close the resource
+            fileReader.close();
         } catch (IOException e) {
             throw new HttpConfigurationException(e);
         }
