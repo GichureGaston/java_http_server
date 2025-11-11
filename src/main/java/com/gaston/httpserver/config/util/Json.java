@@ -6,15 +6,18 @@ import com.fasterxml.jackson.databind.*;
 import java.io.IOException;
 
 public class Json {
-    private static ObjectMapper myObjectMapper ;
+    private static final ObjectMapper myObjectMapper ;
+    static {
+        myObjectMapper = new ObjectMapper();
+        myObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
     public static ObjectMapper defaultObjectMapper(){
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,  false);
         return objectMapper;
     };
     public static JsonNode parse(String jsonSrc)throws IOException {
-        return new ObjectMapper().readTree(jsonSrc);
-    }
+        return myObjectMapper.readTree(jsonSrc);    }
     public static<A> A fromJson(JsonNode node , Class<A> clazz) throws JsonProcessingException {
             return myObjectMapper.treeToValue(node, clazz);
     }
