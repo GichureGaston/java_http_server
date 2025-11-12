@@ -21,7 +21,7 @@ public class HttpConnectionWorkerThread extends  Thread {
     @Override
     public void run() {
         try{
-    LOGGER.info("Connection Accepted:"+socket.getInetAddress());
+            LOGGER.info("Connection Accepted:{}", socket.getInetAddress());
     InputStream inputStream = socket.getInputStream();
     OutputStream outputStream = socket.getOutputStream();
 

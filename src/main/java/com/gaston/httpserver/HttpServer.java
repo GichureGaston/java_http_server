@@ -17,8 +17,8 @@ public class HttpServer {
         LOGGER.info("Server Start!");
         ConfigurationManager.getInstance().loadConfigurationFile("src/main/resources/http.json");
         Configuration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
-        LOGGER.info("Using Port : "+conf.getPort());
-        LOGGER.info("Using WebRoot : "+conf.getWebroot());
+        LOGGER.info("Using Port : {}", conf.getPort());
+        LOGGER.info("Using WebRoot : {}", conf.getWebroot());
         try {
             ServerListenerThread serverListenerThread = new ServerListenerThread(conf.getPort(),conf.getWebroot());
             serverListenerThread.start();
