@@ -24,6 +24,12 @@ public class HttpConnectionWorkerThread extends  Thread {
             LOGGER.info("Connection Accepted:{}", socket.getInetAddress());
     InputStream inputStream = socket.getInputStream();
     OutputStream outputStream = socket.getOutputStream();
+    int _byte ;
+    while((_byte= inputStream.read())>=0){
+        System.out.println((char)_byte);
+    }
+
+
 
     //Write
     String html = "<html><head></head><body><h1>Hello Gustav</h1></body></html>";
