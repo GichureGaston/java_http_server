@@ -31,9 +31,10 @@ class HttpParserTest {
 
         assertNotNull(request);
         assertEquals(HttpMethod.GET, request.getMethod());
+        assertEquals(request.getRequestTarget(), "/");
     }
     @Test
-    void parseHttpRequestBadMethod1() throws HttpParsingException {
+    void parseHttpRequestBadMethod1() {
         try {
             HttpRequest request = httpParser.parseHttpRequest(
                     generateBadTestCaseMethodName1()
@@ -43,7 +44,7 @@ class HttpParserTest {
         assertEquals(HttpStatusCode.CLIENT_ERROR_400_BAD_REQUEST, e.getErrorCode());        }
     }
     @Test
-    void parseHttpRequestBadMethod2() throws HttpParsingException {
+    void parseHttpRequestBadMethod2() {
         try {
             HttpRequest request = httpParser.parseHttpRequest(
                     generateBadTestCaseMethodName2()

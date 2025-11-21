@@ -22,23 +22,6 @@ public class ConfigurationManager {
 
     public void loadConfigurationFile(String filePath) {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filePath);
-        StringBuffer stringBuffer = getStringBuffer(filePath, inputStream);
-
-        JsonNode conf = null;
-        try {
-            conf = Json.parse(stringBuffer.toString());
-        } catch (IOException e) {
-            throw new HttpConfigurationException("Error Parsing Configuration File");
-        }
-
-        try {
-            myCurrentConfiguration = Json.fromJson(conf, Configuration.class);
-        } catch (JsonProcessingException e) {
-            throw new HttpConfigurationException("Error parsing Internal Configuration File");
-        }
-    }
-
-    private static StringBuffer getStringBuffer(String filePath, InputStream inputStream) {
         if (inputStream == null) {
             throw new HttpConfigurationException("Configuration file not found: " + filePath);
         }
@@ -55,7 +38,19 @@ public class ConfigurationManager {
         } catch (IOException e) {
             throw new HttpConfigurationException(e);
         }
-        return stringBuffer;
+
+        JsonNode conf = null;
+        try {
+            conf = Json.parse(stringBuffer.toString());
+        } catch (IOException e) {
+            throw new HttpConfigurationException("Error Parsing Configuration File");
+        }
+
+        try {
+            myCurrentConfiguration = Json.fromJson(conf, Configuration.class);
+        } catch (JsonProcessingException e) {
+            throw new HttpConfigurationException("Error parsing Internal Configuration File");
+        }
     }
 
     public Configuration getCurrentConfiguration() {
