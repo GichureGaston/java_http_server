@@ -15,7 +15,8 @@ public class HttpRequest extends HttpMessage {
      void setMethod(String methodName) throws HttpParsingException {
         for(HttpMethod method : HttpMethod.values()){
             if(methodName.equals(method.name())){
-                this.method = method ;
+                this.method = HttpMethod.valueOf(methodName)  ;
+                return; 
             }
         }
         throw new HttpParsingException(
