@@ -19,7 +19,7 @@ public class HttpParser {
 
         try {
             parseRequestLine(reader, request);
-        } catch (IOException e) {
+        } catch (  IOException e) {
         e.printStackTrace();        }
         parseHeaders(reader, request);
         parseBody(reader, request);

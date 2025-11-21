@@ -30,14 +30,14 @@ class HttpParserTest {
         }
 
         assertNotNull(request);
-        assertEquals(request.getMethod(), HttpMethod.GET);
+        assertEquals(HttpMethod.GET, request.getMethod());
 
     }
     @Test
-    void parseHttpRequestBadMethod() throws IOException {
+    void parseHttpRequestBadMethod() throws HttpParsingException {
         try {
             HttpRequest request = httpParser.parseHttpRequest(
-                    generateBadTestCase()
+                    generateBadTestCaseMethodName1()
             );
             fail();
         } catch (HttpParsingException e) {
@@ -66,7 +66,7 @@ class HttpParserTest {
                 )
         );
     }
-    private InputStream generateBadTestCase(){
+    private InputStream generateBadTestCaseMethodName1(){
         String rawData =
                 "Host: localhost:8000\r\n" +
                 "Accept-Language: en-US,en;q=0.5\r\n" +
