@@ -7,21 +7,23 @@ public class HttpRequest extends HttpMessage {
     private String requestTarget;
     private String httpVersion;
 
-    HttpRequest(){}
     public HttpMethod getMethod() {
         return method;
     }
 
      void setMethod(String methodName) throws HttpParsingException {
+        methodName = methodName.trim().toUpperCase();
         for(HttpMethod method : HttpMethod.values()){
             if(methodName.equals(method.name())){
-                this.method = HttpMethod.valueOf(methodName)  ;
+                this.method = HttpMethod.valueOf(methodName);
                 return;
             }
         }
         throw new HttpParsingException(
                 HttpStatusCode.SERVER_ERROR_501_NOT_IMPLEMENTED
         );
-
+    }
+    public void setRequestTarget(String requestTarget) {
+        this.requestTarget = requestTarget;
     }
 }

@@ -19,29 +19,70 @@ class HttpParserTest {
     }
 
     @Test
-    void parseHttpRequest()  {
+    void parseHttpRequest() {
         HttpRequest request = null;
         try {
             request = httpParser.parseHttpRequest(
                     generateValidGETTestCase()
             );
         } catch (HttpParsingException e) {
-            fail(e);
+            fail();
         }
 
         assertNotNull(request);
         assertEquals(HttpMethod.GET, request.getMethod());
-
     }
     @Test
-    void parseHttpRequestBadMethod() throws HttpParsingException {
+    void parseHttpRequestBadMethod1() throws HttpParsingException {
         try {
             HttpRequest request = httpParser.parseHttpRequest(
                     generateBadTestCaseMethodName1()
             );
             fail();
         } catch (HttpParsingException e) {
-        assertEquals(HttpStatusCode.SERVER_ERROR_501_NOT_IMPLEMENTED, e.getErrorCode());        }
+        assertEquals(HttpStatusCode.CLIENT_ERROR_400_BAD_REQUEST, e.getErrorCode());        }
+    }
+    @Test
+    void parseHttpRequestBadMethod2() throws HttpParsingException {
+        try {
+            HttpRequest request = httpParser.parseHttpRequest(
+                    generateBadTestCaseMethodName2()
+            );
+            fail();
+        } catch (HttpParsingException e) {
+            assertEquals(HttpStatusCode.CLIENT_ERROR_400_BAD_REQUEST, e.getErrorCode());        }
+    }
+
+    @Test
+    void parseHttpInvalidNoItems() {
+        try {
+            HttpRequest request = httpParser.parseHttpRequest(
+                    generateBadTestCaseRequestLineInvalidNumItems()
+            );
+            fail();
+        } catch (HttpParsingException e) {
+            assertEquals(HttpStatusCode.CLIENT_ERROR_400_BAD_REQUEST, e.getErrorCode());       }
+    }
+
+    @Test
+    void parseHttpEmptyRequestLine (){
+        try {
+            HttpRequest request = httpParser.parseHttpRequest(
+                    generateBadTestCaseEmptyRequestLine()
+            );
+            fail();
+        } catch (HttpParsingException e) {
+            assertEquals(HttpStatusCode.CLIENT_ERROR_400_BAD_REQUEST, e.getErrorCode());       }
+    }
+    @Test
+    void parseHttpOnlyCR(){
+        try {
+            HttpRequest request = httpParser.parseHttpRequest(
+                    generateBadTestCaseRequestLineOnlyCR()
+            );
+            fail();
+        } catch (HttpParsingException e) {
+            assertEquals(HttpStatusCode.CLIENT_ERROR_400_BAD_REQUEST, e.getErrorCode());       }
     }
     private InputStream generateValidGETTestCase(){
         String rawData = "GET / HTTP/1.1\r\n" +
@@ -77,6 +118,55 @@ class HttpParserTest {
                 )
         );
     }
+    private InputStream generateBadTestCaseMethodName2(){
+        String rawData ="GETTT/ HTTP/1.1\r\n"+
+                "Host: localhost:8000\r\n" +
+                        "Accept-Language: en-US,en;q=0.5\r\n" +
+                        "\r\n";
+        return new ByteArrayInputStream(
+                rawData.getBytes(
+                        StandardCharsets.US_ASCII
+                )
+        );
+    }
 
+
+    private InputStream generateBadTestCaseRequestLineInvalidNumItems(){
+        String rawData ="GETTT/ AAAAAA HTTP/1.1\r\n"+
+                "Host: localhost:8000\r\n" +
+                "Accept-Language: en-US,en;q=0.5\r\n" +
+                "\r\n";
+        return new ByteArrayInputStream(
+                rawData.getBytes(
+                        StandardCharsets.US_ASCII
+                )
+        );
+    }
+    private InputStream generateBadTestCaseEmptyRequestLine(){
+        String rawData ="\r\n"+
+                "Host: localhost:8000\r\n" +
+                "Accept-Language: en-US,en;q=0.5\r\n" +
+                "\r\n";
+        return new ByteArrayInputStream(
+                rawData.getBytes(
+                        StandardCharsets.US_ASCII
+                )
+        );
+    }
+    private InputStream generateBadTestCaseRequestLineOnlyCR(){
+        String rawData = "GET / HTTP/1.1\r" +
+                "Host: localhost:8000\r\n" +
+                "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:143.0) Gecko/20100101 Firefox/143.0\r\n" +
+                "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n" +
+                "Accept-Language: en-US,en;q=0.5\r\n" +
+                "Accept-Encoding: gzip, deflate, br, zstd\r\n" +
+                "Priority: u=0, i\r\n" +
+                "\r\n";
+        return new ByteArrayInputStream(
+                rawData.getBytes(
+                        StandardCharsets.US_ASCII
+                )
+        );
+    }
 
 }
