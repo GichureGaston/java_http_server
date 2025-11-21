@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.gaston.httpserver.config.util.Json;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class ConfigurationManager {
     private static ConfigurationManager myConfigurationManager;
@@ -21,13 +21,12 @@ public class ConfigurationManager {
     }
 
     public void loadConfigurationFile(String filePath) {
-        FileReader fileReader = null;
-        try {
-            fileReader = new FileReader(filePath);
-        } catch (FileNotFoundException e) {
-            throw new HttpConfigurationException(e);
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filePath);
+        if (inputStream == null) {
+            throw new HttpConfigurationException("Configuration file not found: " + filePath);
         }
 
+        InputStreamReader fileReader = new InputStreamReader(inputStream);
         StringBuffer stringBuffer = new StringBuffer();
         int i;
 

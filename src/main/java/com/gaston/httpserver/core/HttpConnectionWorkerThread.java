@@ -8,58 +8,69 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class HttpConnectionWorkerThread extends  Thread {
+public class HttpConnectionWorkerThread extends Thread {
     public Socket socket;
     public InputStream inputStream;
     public OutputStream outputStream;
-    public final static Logger LOGGER =  LoggerFactory.getLogger(HttpConnectionWorkerThread.class);
-    public HttpConnectionWorkerThread(Socket socket){
+    public final static Logger LOGGER = LoggerFactory.getLogger(HttpConnectionWorkerThread.class);
+
+    public HttpConnectionWorkerThread(Socket socket) {
         this.socket = socket;
     }
 
-
     @Override
     public void run() {
-        try{
+        try {
             LOGGER.info("Connection Accepted:{}", socket.getInetAddress());
-    InputStream inputStream = socket.getInputStream();
-    OutputStream outputStream = socket.getOutputStream();
+            InputStream inputStream = socket.getInputStream();
+            OutputStream outputStream = socket.getOutputStream();
 
-    //Write
-    String html = "<html><head></head><body><h1>Hello Gustav</h1></body></html>";
-    final  String CRLF = "\n\r";
-    String response = "HTTP/1.1  200 OK"+CRLF+"Content Length:"+html.getBytes().length +CRLF+
-            CRLF+
-            html+
-            CRLF+ CRLF;
+            StringBuilder requestBuilder = new StringBuilder();
+            int _byte;
+            while ((_byte = inputStream.read()) >= 0) {
+                char c = (char) _byte;
+                requestBuilder.append(c);
+
+                if (requestBuilder.toString().endsWith("\r\n\r\n")) {
+                    break;
+                }
+            }
+
+            String completeRequest = requestBuilder.toString();
+            LOGGER.info("Received HTTP Request:\n{}", completeRequest);
+
+            String html = "<html><head></head><body><h1>Hello Gustav</h1></body></html>";
+            final String CRLF = "\r\n";
+            String response = "HTTP/1.1 200 OK" + CRLF +
+                    "Content-Length: " + html.getBytes().length + CRLF +
+                    CRLF +
+                    html;
             outputStream.write(response.getBytes());
+            outputStream.flush();
 
-
-
-
-    } catch (IOException e) {
-    LOGGER.error("Problem With Communication:");
-        }finally {
-            if(inputStream!= null){
+        } catch (IOException e) {
+            LOGGER.error("Problem With Communication:", e);
+        } finally {
+            if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
                 }
             }
-            if(outputStream!= null){
+            if (outputStream != null) {
                 try {
                     outputStream.close();
                 } catch (IOException e) {
                 }
-            }if(socket!= null){
+            }
+            if (socket != null) {
                 try {
                     socket.close();
                 } catch (IOException e) {
                 }
             }
         }
+        assert socket != null;
         LOGGER.info("Connection Processing Finished:{}", socket.getInetAddress());
-
-
-}
     }
+}
