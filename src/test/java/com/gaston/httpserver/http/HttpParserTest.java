@@ -31,7 +31,10 @@ class HttpParserTest {
 
         assertNotNull(request);
         assertEquals(HttpMethod.GET, request.getMethod());
-        assertEquals(request.getRequestTarget(), "/");
+        assertEquals("/", request.getRequestTarget());
+        assertEquals("HTTP/1.1", request.getOriginalHttpVersion());
+        assertEquals(HttpVersion.HTTP_1_1, request.getBestCompatibleHttpVersion());
+
     }
     @Test
     void parseHttpRequestBadMethod1() {
@@ -85,6 +88,42 @@ class HttpParserTest {
         } catch (HttpParsingException e) {
             assertEquals(HttpStatusCode.CLIENT_ERROR_400_BAD_REQUEST, e.getErrorCode());       }
     }
+    @Test
+    void parseHttpBadHttpVersion() {
+        try {
+            HttpRequest request = httpParser.parseHttpRequest(
+                    generateBadHttpVersionTestCase()
+            );
+            fail();
+        } catch (HttpParsingException e) {
+            assertEquals(HttpStatusCode.CLIENT_ERROR_400_BAD_REQUEST, e.getErrorCode());        }
+    }
+    @Test
+    void parseHttpUnsupportedHttpVersion() {
+        try {
+            HttpRequest request = httpParser.parseHttpRequest(
+                    generateUnsupportedHttpVersionTestCase()
+            );
+            fail();
+        } catch (HttpParsingException e) {
+            assertEquals(HttpStatusCode.SERVER_ERROR_505_HTTP_VERSION_NOT_SUPPORTED, e.getErrorCode());        }
+    }
+
+    @Test
+    void parseHttpSupportedHttpVersion() {
+        try {
+            HttpRequest request = httpParser.parseHttpRequest(
+                    generateSupportedHttpVersionTestCase()
+            );
+            assertNotNull(request);
+            assertEquals(request.getBestCompatibleHttpVersion(),HttpVersion.HTTP_1_1);
+            assertEquals(request.getOriginalHttpVersion(),"HTTP/1.2");
+        } catch (HttpParsingException e) {
+            fail();
+
+        }
+    }
+
     private InputStream generateValidGETTestCase(){
         String rawData = "GET / HTTP/1.1\r\n" +
                 "Host: localhost:8000\r\n" +
@@ -131,7 +170,6 @@ class HttpParserTest {
         );
     }
 
-
     private InputStream generateBadTestCaseRequestLineInvalidNumItems(){
         String rawData ="GETTT/ AAAAAA HTTP/1.1\r\n"+
                 "Host: localhost:8000\r\n" +
@@ -169,5 +207,76 @@ class HttpParserTest {
                 )
         );
     }
+    private InputStream generateBadHttpVersionTestCase(){
+        String rawData = "GET / HTP/1.2\r\n" +
+                "Host: localhost:8000\r\n" +
+                "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:143.0) Gecko/20100101 Firefox/143.0\r\n" +
+                "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n" +
+                "Accept-Language: en-US,en;q=0.5\r\n" +
+                "Accept-Encoding: gzip, deflate, br, zstd\r\n" +
+                "Sec-GPC: 1\r\n" +
+                "Connection: keep-alive\r\n" +
+                "Upgrade-Insecure-Requests: 1\r\n" +
+                "Sec-Fetch-Dest: document\r\n" +
+                "Sec-Fetch-Mode: navigate\r\n" +
+                "Sec-Fetch-Site: none\r\n" +
+                "Sec-Fetch-User: ?1\r\n" +
+                "DNT: 1\r\n" +
+                "Priority: u=0, i\r\n" +
+                "\r\n";
+        return new ByteArrayInputStream(
+                rawData.getBytes(
+                        StandardCharsets.US_ASCII
+                )
+        );
+    }
+    private InputStream generateUnsupportedHttpVersionTestCase(){
+        String rawData = "GET / HTTP/2.1\r\n" +
+                "Host: localhost:8000\r\n" +
+                "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:143.0) Gecko/20100101 Firefox/143.0\r\n" +
+                "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n" +
+                "Accept-Language: en-US,en;q=0.5\r\n" +
+                "Accept-Encoding: gzip, deflate, br, zstd\r\n" +
+                "Sec-GPC: 1\r\n" +
+                "Connection: keep-alive\r\n" +
+                "Upgrade-Insecure-Requests: 1\r\n" +
+                "Sec-Fetch-Dest: document\r\n" +
+                "Sec-Fetch-Mode: navigate\r\n" +
+                "Sec-Fetch-Site: none\r\n" +
+                "Sec-Fetch-User: ?1\r\n" +
+                "DNT: 1\r\n" +
+                "Priority: u=0, i\r\n" +
+                "\r\n";
+        return new ByteArrayInputStream(
+                rawData.getBytes(
+                        StandardCharsets.US_ASCII
+                )
+        );
+    }
+    private InputStream generateSupportedHttpVersionTestCase(){
+        String rawData = "GET / HTTP/1.2\r\n" +
+                "Host: localhost:8000\r\n" +
+                "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:143.0) Gecko/20100101 Firefox/143.0\r\n" +
+                "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n" +
+                "Accept-Language: en-US,en;q=0.5\r\n" +
+                "Accept-Encoding: gzip, deflate, br, zstd\r\n" +
+                "Sec-GPC: 1\r\n" +
+                "Connection: keep-alive\r\n" +
+                "Upgrade-Insecure-Requests: 1\r\n" +
+                "Sec-Fetch-Dest: document\r\n" +
+                "Sec-Fetch-Mode: navigate\r\n" +
+                "Sec-Fetch-Site: none\r\n" +
+                "Sec-Fetch-User: ?1\r\n" +
+                "DNT: 1\r\n" +
+                "Priority: u=0, i\r\n" +
+                "\r\n";
+        return new ByteArrayInputStream(
+                rawData.getBytes(
+                        StandardCharsets.US_ASCII
+                )
+        );
+    }
+
+
 
 }
